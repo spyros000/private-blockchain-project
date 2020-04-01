@@ -69,7 +69,7 @@ class Blockchain {
            block.time = new Date().getTime().toString().slice(0,-3);
            block.previousBlockHash = currentHeight;
            block.hash = SHA256(block);
-           self.push(block);
+           self.chain.push(block);
            self.height += 1;
         });
     }
