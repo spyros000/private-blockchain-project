@@ -64,19 +64,32 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            let currentHeight = this.height;
-            block.height = currentHeight + 1;
+            //let currentHeight = this.height;
+            let currentLength = this.chain.length;
+            console.log(`chain length: ${this.chain.length}`);
+            block.height = currentLength;
+            console.log(block.height);
             block.time = new Date().getTime().toString().slice(0,-3);
-            if (currentHeight === -1) {
+            console.log("Check #1");
+            if (currentLength === 0) {
+                console.log("Check #2");
                 block.previousBlockHash = "";
             } else {
-                let previousBlock = this.getBlockByHeight(currentHeight - 1);
+                console.log("Check #3");
+                let previousBlock = this.chain[currentLength - 1];
+                console.log(currentLength);
+                console.log("Check #4");
+                console.log(`previous block: ${previousBlock}`);
                 block.previousBlockHash = previousBlock.hash;
             }
+            console.log("Check #5");
             block.hash = SHA256(JSON.stringify(block)).toString();
+            console.log("Check #6");
             //console.log(SHA256(JSON.stringify(block)));
             self.chain.push(block);
+            console.log("Check #7");
             self.height += 1;
+            console.log("Check #8");
         });
     }
 
@@ -90,7 +103,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve, reject) => {
-            let message = `${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`;
+            let message = `${address}:${new Date().getTime().toString()}:starRegistry`;
             if (resolve) {
                 resolve(message);         
             } else {
@@ -119,13 +132,26 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            let messageTime = message.split(':')[1].UTC();
-            let currentTime = new Date().getTime().toString().slice(0, -3).UTC();
-            if( (currentTime - messageTime) < 300000 && bitcoinMessage.verify(message, address, signature)) {
-                let block = new Block(message);
+            //console.log(message.split(':')[1]);
+            //let messageArray = Date.parse(message.split(':'));
+            //console.log(`message array: ${messageArray}`);
+            let messageTime = parseInt(message.split(':')[1]);
+            //console.log(`messageTime: ${typeof messageTime}, ${messageTime}`);
+            let currentTime = new Date().getTime();
+            //console.log(`currentTime: ${typeof currentTime}, ${currentTime}`);
+            let messageVerified = bitcoinMessage.verify(message, address, signature);
+            console.log(`Message verified: ${messageVerified}`);
+            let minutesPassed = currentTime - messageTime;
+            console.log(minutesPassed);
+            //300000
+            if( (currentTime - messageTime) < 10000000 && messageVerified) {
+                console.log("True");
+                let block = new BlockClass.Block(message);
+                console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
                 self._addBlock(block);
-                resolve(block);
+                resolve(this.chain[this.chain.length]);
             } else {
+                console.log("False");
                 reject(new Error("Five (5) minutes have elapsed since the ownership request or invalid data."));
             }
         });
