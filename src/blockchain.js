@@ -90,9 +90,9 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve, reject) => {
-            let message = String.format("%s:%s:starRegistry", address, new Date().getTime().toString().slice(0,-3));
-            if (!reject) {
-                resolve(message);                
+            let message = `${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`;
+            if (resolve) {
+                resolve(message);         
             } else {
                 reject(new Error("Something went wrong."));
             }
