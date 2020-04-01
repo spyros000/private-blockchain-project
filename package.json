@@ -6,6 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/spyros000/private-blockchain-project.git"
+    },
   "author": "Udacity - jose.morales@udacity.com",
   "license": "ISC",
   "dependencies": {
