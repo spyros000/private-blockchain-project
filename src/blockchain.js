@@ -11,6 +11,7 @@
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
+const hex2ascii = require('hex2ascii');
 
 class Blockchain {
 
@@ -66,31 +67,31 @@ class Blockchain {
         return new Promise(async (resolve, reject) => {
             //let currentHeight = this.height;
             let currentLength = this.chain.length;
-            console.log(`chain length: ${this.chain.length}`);
+            //console.log(`chain length: ${this.chain.length}`);
             block.height = currentLength;
-            console.log(block.height);
+            //console.log(block.height);
             block.time = new Date().getTime().toString().slice(0,-3);
-            console.log("Check #1");
+            //console.log("Check #1");
             if (currentLength === 0) {
-                console.log("Check #2");
+                //console.log("Check #2");
                 block.previousBlockHash = "";
             } else {
-                console.log("Check #3");
+                //console.log("Check #3");
                 let previousBlock = this.chain[currentLength - 1];
-                console.log(currentLength);
-                console.log("Check #4");
-                console.log(`previous block height: ${previousBlock.height}`);
+                //console.log(currentLength);
+                //console.log("Check #4");
+                //console.log(`previous block height: ${previousBlock.height}`);
                 block.previousBlockHash = previousBlock.hash;
-                console.log(previousBlock.hash);
+                //console.log(previousBlock.hash);
             }
-            console.log("Check #5");
+            //console.log("Check #5");
             block.hash = SHA256(JSON.stringify(block)).toString();
-            console.log("Check #6");
+            //console.log("Check #6");
             //console.log(SHA256(JSON.stringify(block)));
             self.chain.push(block);
-            console.log("Check #7");
+            //console.log("Check #7");
             self.height += 1;
-            console.log("Check #8");
+            //console.log("Check #8");
             if(resolve) {
                 resolve(block);
             } else{ reject(new Error("The block is rejected."));}
@@ -144,20 +145,20 @@ class Blockchain {
             let currentTime = new Date().getTime();
             //console.log(`currentTime: ${typeof currentTime}, ${currentTime}`);
             let messageVerified = bitcoinMessage.verify(message, address, signature);
-            console.log(`Message verified: ${messageVerified}`);
+            //console.log(`Message verified: ${messageVerified}`);
             let minutesPassed = currentTime - messageTime;
-            console.log(minutesPassed);
+            //console.log(minutesPassed);
             //300000
             if( (currentTime - messageTime) < 10000000 && messageVerified) {
-                console.log("True");
+                //console.log("True");
                 let block = new BlockClass.Block(message);
-                console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
+                //console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
                 self._addBlock(block);
                 //resolve(this.chain[this.chain.length]);
                 return resolve(block);
             } 
             else {
-                console.log("False");
+                //console.log("False");
                 reject("Five (5) minutes have elapsed since the ownership request or invalid data.");
             }
         });
@@ -203,28 +204,46 @@ class Blockchain {
     }
 
     /**
-     * This method will return a Promise that will resolve with an array of Stars objects existing in the chain 
-     * and are belongs to the owner with the wallet address passed as parameter.
+     * This method will return a Promise that will resolve with an array of "Star" objects existing in the chain 
+     * and belong to the owner with the wallet address passed as parameter.
      * Remember the star should be returned decoded.
      * @param {*} address 
      */
     getStarsByWalletAddress (address) {
         console.log("Check #1");
         let self = this;
+        //let arrayOfBlocks = [];
         let arrayOfStars = [];
         return new Promise((resolve, reject) => {
             console.log("Check #2");
-            let arrayOfBlocks = self.chain.filter( (aBlock) => { 
-                console.log("Check #3");
-                aBlock.getBData().split(':')[0] === address;
-            });
-            console.log(`Array of blocks: ${arrayOfBlocks}`);
-            arrayOfBlocks.forEach( element => { arrayOfStars.push(element.getBData().split(':')[2]) } );
-            if(arrayOfStars.length) {
-                resolve(arrayOfStars);
-            } else { reject(new Error("No stars registered with this address."));}
+            let i = 0;
+            let chainArray = this.chain;
+            for (; i < chainArray.length; i++) {
+                console.log(`Iteration ${i}`);
+                console.log(`current block: ${chainArray[i].height}`);
+                let aBlock = chainArray[i];
+                console.log(`the current block body is: ${aBlock.body}`);
+                console.log(`body ascii: ${JSON.parse(hex2ascii(aBlock.body))}`);
+                if(aBlock.height !== 0) {
+                    let aBlockData = JSON.parse(hex2ascii(aBlock.body));
+                    console.log(`The block's data is: ${aBlockData}`);
+                    let aBlockAddress =  aBlockData.split(':')[0];
+                    console.log(`the block's address is: ${aBlockAddress}`);
+                    if(aBlockAddress === address) {
+                        arrayOfStars.push(aBlockData.split(":")[2]);
+                    }
+                }
+            }
+            console.log(`Array of blocks: ${arrayOfStars}`);
+            if(arrayOfStars.length > 0) {
+                return resolve(arrayOfStars);
+            }
+            else { reject(new Error("No stars registered with this address."));}
+            
         });
+
     }
+
 
     /**
      * This method will return a Promise that will resolve with the list of errors when validating the chain.
