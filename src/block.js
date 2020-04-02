@@ -70,11 +70,13 @@ class Block {
         
         let self = this;
         return new Promise( (resolve, reject) => {
-            if(self.height == 0) {
-                reject(new Error("Genesis block does not have anything to decode."));
-            } else if (self.height != 0) {
+            if(self.height === 0) {
+                continue;
+            } else if (self.height !== 0) {
+                console.log("getBData resolved.");
                 resolve(JSON.parse(hex2ascii(self.body)));
             } else {
+                console.log("getBData rejected.");
                 reject(new Error("An unexpected error occurred."));
             }
         } );

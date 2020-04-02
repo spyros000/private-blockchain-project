@@ -153,12 +153,10 @@ class Blockchain {
                 let block = new BlockClass.Block(message);
                 console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
                 self._addBlock(block);
-                //resolve(this.chain[this.chain.length]);
-                return resolve(block);
-            } 
-            else {
+                resolve(this.chain[this.chain.length]);
+            } else {
                 console.log("False");
-                reject("Five (5) minutes have elapsed since the ownership request or invalid data.");
+                reject(new Error("Five (5) minutes have elapsed since the ownership request or invalid data."));
             }
         });
     }
@@ -209,16 +207,11 @@ class Blockchain {
      * @param {*} address 
      */
     getStarsByWalletAddress (address) {
-        console.log("Check #1");
         let self = this;
-        let arrayOfStars = [];
+        let stars = [];
         return new Promise((resolve, reject) => {
-            console.log("Check #2");
-            let arrayOfBlocks = self.chain.filter( (aBlock) => { 
-                console.log("Check #3");
-                aBlock.getBData().split(':')[0] === address;
-            });
-            console.log(`Array of blocks: ${arrayOfBlocks}`);
+            const arrayOfBlocks = self.chain.filter( (aBlock) => { aBlock.getBData().split(':')[0] === address; });
+            let arrayOfStars = [];
             arrayOfBlocks.forEach( element => { arrayOfStars.push(element.getBData().split(':')[2]) } );
             if(arrayOfStars.length) {
                 resolve(arrayOfStars);

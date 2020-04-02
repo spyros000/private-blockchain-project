@@ -4,5 +4,6 @@
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/src/blockchain.js" type="1"/>
 </workingSet>
 <workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1585569105057_0" label="Window Working Set" name="Aggregate for window 1585569105056"/>
+<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1585804712478_2" label="Window Working Set" name="Aggregate for window 1585804712478"/>
 <mruList name="udacoinChain"/>
 </workingSetManager>
