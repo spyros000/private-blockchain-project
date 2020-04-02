@@ -69,16 +69,20 @@ class Block {
         // Resolve with the data if the object isn't the Genesis block
         
         let self = this;
-        return new Promise( (resolve, reject) => {
-            if(self.height === 0) {
-                continue;
-            } else if (self.height !== 0) {
-                console.log("getBData resolved.");
+        return new Promise(  (resolve, reject) => {
+            //if(self.height === 0) {
+                //continue;
+            //}            else 
+            if (self.height !== 0) {
+                console.log(`getBData resolved: ${JSON.parse(hex2ascii(self.body))}`);
                 resolve(JSON.parse(hex2ascii(self.body)));
-            } else {
+            } 
+            else {
                 console.log("getBData rejected.");
                 reject(new Error("An unexpected error occurred."));
+                //reject("No  block data.");
             }
+            
         } );
     }
 }
