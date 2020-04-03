@@ -155,11 +155,11 @@ class Blockchain {
                 /*Construct the string to use as data for hte block's body property 
                  * { owner: address, star: { "dec": "68° 52' 56.9", "ra": "16h 29m 1.0s", "story": "Testing the story 4"} }
                 */
-               console.log(star);
+                //console.log(star);
                 let blockData = `{"owner": ${message.split(':')[0]}, "star": ${JSON.stringify(star)}}`;
-                console.log(blockData);
+                //console.log(blockData);
                 let block = new BlockClass.Block(blockData);
-                console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
+                //console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
                 self._addBlock(block);
                 //resolve(this.chain[this.chain.length]);
                 return resolve(block);
@@ -179,17 +179,27 @@ class Blockchain {
      */
     getBlockByHash(hash) {
         let self = this;
+        console.log("Check #1");
         return new Promise( (resolve, reject) => {
-            const result = self.chain.filter( (aBlock) => {
-                aBlock.hash === hash;
-            } );
-            if (result.length === 1) {
-                resolve(result[0]);
-            } else if (result.length > 1) {
-                reject(new Error("More than one blocks were returned."));
+            console.log(hash);
+            let chainArrayLength = self.chain.length;
+            let i = 0;
+            let result;
+            for ( ; i < chainArrayLength; i++) {
+                if ( self.chain[i].hash === hash ) {
+                    result = self.chain[i];
+                    console.log("Check #Found");
+                    return resolve(result);
+                }
+            }
+            /*
+            if (result) {
+                return resolve(result);
             } else {
+                //console.log("Check #Error");
                 reject(new Error("No block returned"));
             }
+            */
         });
     }
 
@@ -225,7 +235,8 @@ class Blockchain {
             //console.log("Check #2");
             let i = 0;
             let chainArray = this.chain;
-            for (; i < chainArray.length; i++) {
+            let chainArrayLength = chainArray.length;
+            for (; i < chainArrayLength; i++) {
                 //console.log(`Iteration ${i}`);
                 //console.log(`current block: ${chainArray[i].height}`);
                 let aBlock = chainArray[i];
