@@ -150,9 +150,16 @@ class Blockchain {
             //console.log(minutesPassed);
             //300000
             if( (currentTime - messageTime) < 10000000 && messageVerified) {
+                
                 //console.log("True");
-                let block = new BlockClass.Block(message);
-                //console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
+                /*Construct the string to use as data for hte block's body property 
+                 * { owner: address, star: { "dec": "68° 52' 56.9", "ra": "16h 29m 1.0s", "story": "Testing the story 4"} }
+                */
+               console.log(star);
+                let blockData = `{"owner": ${message.split(':')[0]}, "star": ${JSON.stringify(star)}}`;
+                console.log(blockData);
+                let block = new BlockClass.Block(blockData);
+                console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
                 self._addBlock(block);
                 //resolve(this.chain[this.chain.length]);
                 return resolve(block);
@@ -179,7 +186,7 @@ class Blockchain {
             if (result.length === 1) {
                 resolve(result[0]);
             } else if (result.length > 1) {
-                reject(new Error("More than one blocks were returned."))
+                reject(new Error("More than one blocks were returned."));
             } else {
                 reject(new Error("No block returned"));
             }
@@ -210,35 +217,40 @@ class Blockchain {
      * @param {*} address 
      */
     getStarsByWalletAddress (address) {
-        console.log("Check #1");
+        //console.log("Check #1");
         let self = this;
         //let arrayOfBlocks = [];
         let arrayOfStars = [];
         return new Promise((resolve, reject) => {
-            console.log("Check #2");
+            //console.log("Check #2");
             let i = 0;
             let chainArray = this.chain;
             for (; i < chainArray.length; i++) {
-                console.log(`Iteration ${i}`);
-                console.log(`current block: ${chainArray[i].height}`);
+                //console.log(`Iteration ${i}`);
+                //console.log(`current block: ${chainArray[i].height}`);
                 let aBlock = chainArray[i];
-                console.log(`the current block body is: ${aBlock.body}`);
-                console.log(`body ascii: ${JSON.parse(hex2ascii(aBlock.body))}`);
+                //console.log(`the current block body is: ${aBlock.body}`);
+                //console.log(`body ascii: ${hex2ascii(aBlock.body)}`);
                 if(aBlock.height !== 0) {
+                    //console.log(`block's body to ascii is ${hex2ascii(aBlock.body)}`);
+                    //console.log(`block owner: ${hex2ascii(aBlock.body).owner}`);
+                    //console.log(`block owner (parsed body) ${JSON.parse(hex2ascii(aBlock.body)).owner}`);
                     let aBlockData = JSON.parse(hex2ascii(aBlock.body));
-                    console.log(`The block's data is: ${aBlockData}`);
-                    let aBlockAddress =  aBlockData.split(':')[0];
-                    console.log(`the block's address is: ${aBlockAddress}`);
+                    //console.log(`The block's data is: ${aBlockData}`);
+                    //console.log(`${typeof aBlockData} ${aBlockData.constructor}`);
+                    //let aBlockAddress =  aBlockData.split(',')[0].slice(8);
+                    let aBlockAddress = aBlockData.slice(10, 44);
+                    //console.log(`the block's address is: ${aBlockAddress}`);
                     if(aBlockAddress === address) {
-                        arrayOfStars.push(aBlockData.split(":")[2]);
+                        arrayOfStars.push(aBlockData.slice(54));
                     }
                 }
             }
-            console.log(`Array of blocks: ${arrayOfStars}`);
+            //console.log(`Array of blocks: ${arrayOfStars}`);
             if(arrayOfStars.length > 0) {
                 return resolve(arrayOfStars);
             }
-            else { reject(new Error("No stars registered with this address."));}
+            else { return reject(new Error("No stars registered with this address."));}
             
         });
 
