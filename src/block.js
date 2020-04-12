@@ -45,6 +45,9 @@ class Block {
             // Returning the Block is valid
 
             let currentBlockHash = self.hash;
+            self.hash = null;
+            let newBlockHash = SHA256(JSON.stringify(self).toString());
+            self.hash = currentBlockHash;
             if(SHA256(self) === currentBlockHash ) {
 	            resolve(true);
             } else {
