@@ -278,8 +278,8 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            self.forEach( (element) => {
-                if ( element.validate() ) {
+            self.chain.forEach(async  (element) => {
+                if (await element.validate() ) {
                     if(element.hash !== self.chain[element.height + 1].previousBlockHash) {
                         errorLog.push(new Error(element.blockHeight));
                     }
