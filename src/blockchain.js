@@ -146,10 +146,10 @@ class Blockchain {
             //console.log(`currentTime: ${typeof currentTime}, ${currentTime}`);
             let messageVerified = bitcoinMessage.verify(message, address, signature);
             //console.log(`Message verified: ${messageVerified}`);
-            let minutesPassed = currentTime - messageTime;
+            let millisecondsPassed = currentTime - messageTime;
             //console.log(minutesPassed);
             //300000
-            if( (currentTime - messageTime) < 10000000 && messageVerified) {
+            if( millisecondsPassed < 10000000 && messageVerified) {
                 
                 //console.log("True");
                 /*Construct the string to use as data for hte block's body property 
@@ -162,11 +162,12 @@ class Blockchain {
                 //console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
                 self._addBlock(block);
                 //resolve(this.chain[this.chain.length]);
+                console.log("Star successfully submitted.");
                 return resolve(block);
             } 
             else {
                 //console.log("False");
-                reject("Five (5) minutes have elapsed since the ownership request or invalid data.");
+                return reject(new Error("Five (5) minutes have elapsed since the ownership request or invalid data."));
             }
         });
     }
@@ -178,28 +179,26 @@ class Blockchain {
      * @param {*} hash 
      */
     getBlockByHash(hash) {
-        let self = this;
-        console.log("Check #1");
+        //let self = this;
+        //console.log("Check #1");
         return new Promise( (resolve, reject) => {
             console.log(hash);
-            let chainArrayLength = self.chain.length;
+            let chainArrayLength = this.chain.length;
             let i = 0;
             let result;
             for ( ; i < chainArrayLength; i++) {
-                if ( self.chain[i].hash === hash ) {
-                    result = self.chain[i];
+                console.log(`current hash ${this.chain[i].hash} @ height ${i}`);
+                if ( this.chain[i].hash === hash ) {
+                    result = this.chain[i];
                     console.log("Check #Found");
-                    return resolve(result);
+                    //break;
                 }
             }
-            /*
-            if (result) {
-                return resolve(result);
-            } else {
-                //console.log("Check #Error");
-                reject(new Error("No block returned"));
+            if (result){
+                resolve(result);
+            }else {
+                reject("Not found.");
             }
-            */
         });
     }
 
@@ -210,12 +209,10 @@ class Blockchain {
      */
     getBlockByHeight(height) {
         let self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             let block = self.chain.filter(p => p.height === height)[0];
             if(block){
                 resolve(block);
-            } else {
-                resolve(null);
             }
         });
     }
@@ -233,35 +230,37 @@ class Blockchain {
         let arrayOfStars = [];
         return new Promise((resolve, reject) => {
             //console.log("Check #2");
+            
             let i = 0;
-            let chainArray = this.chain;
+            let chainArray = self.chain;
             let chainArrayLength = chainArray.length;
+            console.log(`chainArrayLength: ${chainArrayLength}`);
             for (; i < chainArrayLength; i++) {
-                //console.log(`Iteration ${i}`);
-                //console.log(`current block: ${chainArray[i].height}`);
+                console.log(`Iteration ${i}`);
+                console.log(`current block: ${chainArray[i].height}`);
                 let aBlock = chainArray[i];
-                //console.log(`the current block body is: ${aBlock.body}`);
+               console.log(`the current block body is: ${aBlock.getBData()}`);
                 //console.log(`body ascii: ${hex2ascii(aBlock.body)}`);
                 if(aBlock.height !== 0) {
                     //console.log(`block's body to ascii is ${hex2ascii(aBlock.body)}`);
                     //console.log(`block owner: ${hex2ascii(aBlock.body).owner}`);
                     //console.log(`block owner (parsed body) ${JSON.parse(hex2ascii(aBlock.body)).owner}`);
-                    let aBlockData = JSON.parse(hex2ascii(aBlock.body));
-                    //console.log(`The block's data is: ${aBlockData}`);
+                    //let aBlockData =  aBlock.getBData().then(async (result) => { await resolve(result);} );
+                    console.log(`The block's data is: ${aBlockData}`);
                     //console.log(`${typeof aBlockData} ${aBlockData.constructor}`);
-                    //let aBlockAddress =  aBlockData.split(',')[0].slice(8);
-                    let aBlockAddress = aBlockData.slice(10, 44);
+                    //let aBlockAddress =  aBlockData.address;
+                    //let aBlockAddress = aBlockData.slice(10, 44);
                     //console.log(`the block's address is: ${aBlockAddress}`);
-                    if(aBlockAddress === address) {
-                        arrayOfStars.push(aBlockData.slice(54));
-                    }
+                    /*if(aBlockAddress === address) {
+                        arrayOfStars.push(aBlockData);
+                    }*/
                 }
             }
             //console.log(`Array of blocks: ${arrayOfStars}`);
             if(arrayOfStars.length > 0) {
-                return resolve(arrayOfStars);
+                resolve(arrayOfStars);
             }
-            else { return reject(new Error("No stars registered with this address."));}
+            else { reject(new Error("No stars registered with this address."));}
             
         });
 
