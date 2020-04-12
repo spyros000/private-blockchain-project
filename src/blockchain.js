@@ -156,7 +156,7 @@ class Blockchain {
                  * { owner: address, star: { "dec": "68° 52' 56.9", "ra": "16h 29m 1.0s", "story": "Testing the story 4"} }
                 */
                 //console.log(star);
-                let blockData = `{"owner": ${message.split(':')[0]}, "star": ${JSON.stringify(star)}}`;
+                let blockData = `{"owner": ${message.split(':')[0]}, "star": ${star}}}`;
                 //console.log(blockData);
                 let block = new BlockClass.Block(blockData);
                 //console.log(`Created block: hash: ${block.hash}, height: ${block.height}, body: ${block.body}, time: ${block.time}, previousBlockHash: ${block.previousBlockHash}`);
