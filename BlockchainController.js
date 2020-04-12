@@ -84,7 +84,6 @@ class BlockchainController {
             
             if(req.params.hash) {
                 const hash = req.params.hash;
-                
                 let block = await this.blockchain.getBlockByHash(hash);
                 if(block){
                     return res.status(200).json(block);
